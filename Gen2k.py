@@ -7,6 +7,7 @@ __version__   = 'BETA'
 __date__      = '18/05/2013'
 
 import sys
+from itertools import product
 
 
 """
@@ -72,6 +73,8 @@ def help():
 
     [ -y ] Enable year combination with wordlist.
 
+    [ -l ] Enable leet combination with wordlist.
+
     [ -z ] Enable conversion of words to upper & lower case letters.
 
            Note: Conversion to upper/lowercase & capitalisation
@@ -96,6 +99,10 @@ def main():
 
     data = [] # Final wordlist
     temp = [] # Temporary wordlist
+
+    if exist('-l'):
+        master_list = gen_leet(master_list)
+        data = master_list
 
     if exist('-z'):
         master_list = gen_case(master_list)
@@ -187,15 +194,12 @@ def gen_case(words=[]):
     """
     Function to change words to Upper & Lower case.
     """
-    custom_list = []
+    word_list = []
 
-    for x in words:
-        custom_list.append(x.lower())
-        custom_list.append(x.capitalize())
-        custom_list.append(x.upper())
+    for word in words:
+        word_list += list(map(''.join, product(*(sorted(set((c.upper(), c.lower()))) for c in word))))
 
-    return list(set(custom_list))
-
+    return word_list
 
 
 def gen_numbers(words=[]):
@@ -292,6 +296,16 @@ def gen_custom(words=[], data=[]):
 
     return word_list
 
+def gen_leet(words=[]):
+    REPLACE = {'a': '4', 'b': '8', 'e': '3', 'g': '6', 'i': '1','o': '0', 's': '5', 't': '7', 'z': '2'}
+    word_list  = []
+    for word in words:
+        possibles = []
+        for l in word.lower():
+            ll = REPLACE.get(l, l)
+            possibles.append( (l,) if ll == l else (l, ll) )
+        word_list += [ ''.join(t) for t in product(*possibles) ]
+    return word_list
 
 
 def wpa_validation_check(words=[]):
